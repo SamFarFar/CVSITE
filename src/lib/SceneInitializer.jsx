@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
@@ -15,7 +14,6 @@ export default class SceneInitializer {
         this.nearPlane = 1;
         this.farPlane = 1000;
         this.canvasID = canvasID;
-    
         // NOTE: Additional components.
         this.clock = undefined;
         this.stats = undefined;
@@ -35,7 +33,7 @@ export default class SceneInitializer {
     }
    
     initalize(){
-
+        
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(
             this.fov,
@@ -43,25 +41,21 @@ export default class SceneInitializer {
             this.nearPlane,
             this.farPlane
             );
-            this.camera.position.set(
-                -5.079442473576416,
-                3.9072535659226775,
-                9.571777431259965)
+            
 
             const canvas = document.getElementById(this.canvasID);
+
             this.renderer= new THREE.WebGLRenderer({
                 canvas,
                 antialias:true,
             });
-
-
+            document.body.appendChild( this.renderer.domElement );
             this.startPoint = new THREE.Vector3(-5.079442473576416,
                 3.9072535659226775,
                 9.571777431259965);
 
             // logic for helix spiral movement
-           // const towerCenter = new THREE.Vector3(0.9144808865880965, 13.133300864715576, 0.1071671011090305);
-            const radius = Math.sqrt(
+             const radius = Math.sqrt(
                 Math.pow(this.startPoint.x - this.towerCenter.x, 2) + 
                 Math.pow(this.startPoint.z - this.towerCenter.z, 2)
             )*0.7;
@@ -72,7 +66,7 @@ export default class SceneInitializer {
             
             const totalPoints = revolutions * pointsPerRevolution;
             for (let i = 0; i < totalPoints; i++) {
-                const angle = (i / pointsPerRevolution) * Math.PI * 2; // Angle in radians
+                const angle = (i / pointsPerRevolution) * Math.PI * 2 + 2; // Angle in radians
                 
                 // Compute new X, Z positions relative to tower center
                 const x = this.towerCenter.x + radius * Math.cos(angle);
@@ -85,7 +79,10 @@ export default class SceneInitializer {
                 this.curvePoints.push(new THREE.Vector3(x, y, z));
             }
           
-           
+           this.camera.position.set(
+                -5.079442473576416,
+                3.9072535659226775,
+                9.571777431259965)
 
             this.path = new THREE.CatmullRomCurve3(this.curvePoints);
             this.renderer.setSize(window.innerWidth,window.innerHeight);
@@ -115,21 +112,21 @@ export default class SceneInitializer {
     }
 
     animate(){
-        window.requestAnimationFrame(this.animate.bind(this));
+        this.req = window.requestAnimationFrame(this.animate.bind(this));
         this.stats.update();
        // this.controls.update(); // wont allow the camera to look at the updating center of the tower
         this.render();
-  
     }
     render(){
+      //  console.log(this.renderer.getContext());
         this.renderer.render(this.scene,this.camera);
+        
     }
     getRenderer(){
         return this.renderer;
     }
     
-    
-
+ 
    onScroll(ev){
     const scrollSpeed = 0.002;
     this.t += ev.deltaY * scrollSpeed; // Adjust movement speed
