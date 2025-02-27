@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { DragControls } from 'three/examples/jsm/Addons.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
@@ -23,13 +24,22 @@ export default class SceneInitializer {
         this.ambientLight = undefined;
         this.spotLight = undefined;
 
-        this.onScroll = this.onScroll.bind(this);
-        this.onWindowResize = this.onWindowResize.bind(this);
+        
+            // Existing properties...
+            this.onScroll = this.onScroll.bind(this);
+            this.onWindowResize = this.onWindowResize.bind(this);
+            
+        
+        
         this.curvePoints = [];
         this.startPoint = undefined
         this.path = undefined;
         this.t = 0;
         this.towerCenter = new THREE.Vector3(0.9144808865880965, 13.133300864715576, 0.1071671011090305);
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+        this.selectedObject = null;
+        this.objects = []
     }
    
     initalize(){
@@ -42,13 +52,13 @@ export default class SceneInitializer {
             this.farPlane
             );
             
-
             const canvas = document.getElementById(this.canvasID);
 
             this.renderer= new THREE.WebGLRenderer({
                 canvas,
                 antialias:true,
             });
+
             document.body.appendChild( this.renderer.domElement );
             this.startPoint = new THREE.Vector3(-5.079442473576416,
                 3.9072535659226775,
@@ -59,7 +69,7 @@ export default class SceneInitializer {
                 Math.pow(this.startPoint.x - this.towerCenter.x, 2) + 
                 Math.pow(this.startPoint.z - this.towerCenter.z, 2)
             )*0.7;
-            
+
             const height = 18; // Spiral height
             const revolutions = 0.925; // Full rotations
             const pointsPerRevolution = 10; // Smoothness
@@ -91,8 +101,8 @@ export default class SceneInitializer {
             this.stats = new Stats();
             document.body.appendChild(this.stats.dom);
             this.controls = new OrbitControls(this.camera,this.renderer.domElement);
-            this.controls.enableZoom = false;  // Allow zooming with scroll
-            this.controls.enableRotate = true; // Allow rotation
+            this.controls.enableZoom =false;  // Allow zooming with scroll
+            this.controls.enableRotate = false; // Allow rotation
             this.controls.enablePan = false;   // Disable panning
             this.clock = new THREE.Clock();
             
@@ -108,7 +118,6 @@ export default class SceneInitializer {
             window.addEventListener('wheel', this.onScroll, false);
             window.addEventListener('resize', this.onWindowResize, false);
             
-
     }
 
     animate(){
@@ -126,7 +135,17 @@ export default class SceneInitializer {
         return this.renderer;
     }
     
- 
+    makeDragDropable(){
+        const dControls = new DragControls(this.objects,this.camera,this.renderer.domElement);
+        dControls.addEventListener('dragend', function(event) {
+            console.log("Final Position:", event.object.position);
+          });
+    }
+
+    addObject(object){
+        this.objects.push(object);
+        this.scene.add(object);
+    }
    onScroll(ev){
     const scrollSpeed = 0.002;
     this.t += ev.deltaY * scrollSpeed; // Adjust movement speed
