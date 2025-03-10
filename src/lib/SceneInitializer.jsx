@@ -75,7 +75,7 @@ export default class SceneInitializer {
             const pointsPerRevolution = 10; // Smoothness
             
             const totalPoints = revolutions * pointsPerRevolution;
-            for (let i = 0; i < totalPoints; i++) {
+            for (let i = 0; i < totalPoints-1; i++) {
                 const angle = (i / pointsPerRevolution) * Math.PI * 2 + 2; // Angle in radians
                 
                 // Compute new X, Z positions relative to tower center
@@ -137,8 +137,14 @@ export default class SceneInitializer {
     
     makeDragDropable(){
         const dControls = new DragControls(this.objects,this.camera,this.renderer.domElement);
+        
         dControls.addEventListener('dragend', function(event) {
-            console.log("Final Position:", event.object.position);
+             event.object.updateMatrixWorld(true);
+            // This will give you the correct position due to the fact
+            // the position is now in relation to the scene (I believe)
+            const worldPosition = new THREE.Vector3();
+            event.object.getWorldPosition(worldPosition);
+            console.log("World Position:", worldPosition);
           });
     }
 
