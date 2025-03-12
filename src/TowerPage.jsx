@@ -41,6 +41,7 @@ loader2.load('/flag_with_pole/scene.gltf',
        object.rotateY(Math.PI/180 * 180);
        object.rotateZ(Math.PI/180 * 185);
        scene.addObject(object);
+       console.log(object.uuid);
        setObjects(prevObjects => [...prevObjects, object]); // Append to state
   }, function(xhr){
     console.log((xhr.loaded/xhr.total *100) + "% Complete.")
@@ -61,6 +62,7 @@ loader3.load('/flag_with_pole/scene.gltf',
        object.rotateY(Math.PI/180 * 180);
        object.rotateZ(Math.PI/180 * 90);
        scene.addObject(object);
+       console.log(object.uuid);
        setObjects(prevObjects => [...prevObjects, object]); // Append to state
   }, function(xhr){
     console.log((xhr.loaded/xhr.total *100) + "% Complete.")
@@ -82,6 +84,7 @@ loader4.load('/flag_with_pole/scene.gltf',
        object.rotateY(Math.PI/180 * 180);
        object.rotateZ(Math.PI/180* 135);
        scene.addObject(object);
+       console.log(object.uuid);
        setObjects(prevObjects => [...prevObjects, object]); // Append to state
   }, function(xhr){
     console.log((xhr.loaded/xhr.total *100) + "% Complete.")
